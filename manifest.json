@@ -1,12 +1,15 @@
 {
   "name": "专注工作台",
   "short_name": "专注",
-  "description": "极简专注管理工具 — 3件事 + 番茄钟 + 娱乐预算 + 每日复盘",
+  "description": "今日要事 + 番茄钟 + 每日打卡 + 电子猫 + 物品收纳 + 视频拆解，数据全本地，离线可用",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#faf7f2",
   "theme_color": "#7a8c80",
+  "lang": "zh-CN",
+  "categories": ["productivity", "lifestyle"],
   "icons": [
     {
       "src": "icon.svg",
@@ -14,5 +17,10 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    { "name": "今日要事", "short_name": "今日", "url": "./?tab=today" },
+    { "name": "每日打卡", "short_name": "打卡", "url": "./?tab=quest" },
+    { "name": "去喂猫", "short_name": "猫屋", "url": "./?tab=cat" }
   ]
 }
