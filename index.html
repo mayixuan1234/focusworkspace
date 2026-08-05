@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#7a8c80">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="专注">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+
+  <style>
+    :root {
+      --bg:#faf7f2; --card:#ffffff; --card2:#f5f1ea;
+      --sage:#7a8c80; --sage-d:#5a6b60; --sage-l:#a3b5a8; --sage-p:#e8ede9;
+      --terra:#c4886a; --terra-p:#f5e8e0;
+      --amber:#e0a458; --amber-p:#fdf3e3;
+      --ink:#2d2d2d; --mist:#8a8a8a; --line:#e8e2d8;
+      --blue:#5b8bb5; --blue-p:#e6eff6;
+      --green:#6aa86a; --green-p:#e6f0e6;
+      --orange:#d4944f; --orange-p:#f7ecdd;
+      --shadow:0 1px 3px rgba(0,0,0,.06);
+    }
+    [data-theme="dark"] {
+      --bg:#16181a; --card:#212423; --card2:#1b1e1c;
+      --sage:#9bb0a2; --sage-d:#7a8c80; --sage-l:#6a7a70; --sage-p:#2c3530;
+      --terra:#d6a085; --terra-p:#332a24;
+      --amber:#e8b870; --amber-p:#332c1e;
+      --ink:#e8e8e6; --mist:#9a9a98; --line:#333734;
+      --blue:#7ba6cc; --blue-p:#1f2a33;
+      --green:#8cc08c; --green-p:#1f2c1f;
+      --orange:#e0a868; --orange-p:#33291d;
+      --shadow:0 1px 3px rgba(0,0,0,.3);
+    }
+
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    html, body { margin:0; padding:0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg); color: var(--ink);
+      overscroll-behavior: none; line-height: 1.5;
+      transition: background .3s ease, color .3s ease;
+    }
+    .wrap { max-width: 28rem; margin: 0 auto; padding: 2rem 1.25rem calc(2rem + env(safe-area-inset-bottom)); }
+
+    .card { background: var(--card); border:1px solid var(--line); border-radius:1rem; padding:1.25rem; box-shadow: var(--shadow); margin-bottom:1.25rem; }
+    .sec-title { display:flex; align-items:center; gap:.5rem; font-size:1rem; font-weight:700; margin:0 0 1rem; }
+    .sec-title svg { width:20px; height:20px; flex-shrink:0; }
+    .pill { font-size:.7rem; font-weight:700; padding:.15rem .6rem; border-radius:999px; }
+    .pill-sage { background: var(--sage-p); color: var(--sage-d); }
+
+    .btn { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:0 1.1rem; border-radius:.75rem; font-size:.875rem; font-weight:600; border:none; cursor:pointer; transition: transform .1s, background .15s; user-select:none; }
+    .btn:active { transform: scale(.96); }
+    .btn-sage { background: var(--sage); color:#fff; }
+    .btn-sage:hover { background: var(--sage-d); }
+    .btn-ghost { background: var(--card2); color: var(--ink); border:1px solid var(--line); }
+    .btn-ghost:hover { background: var(--line); }
+    .btn-sm { min-height:38px; padding:0 .8rem; font-size:.8rem; }
+
+    .input { width:100%; min-height:44px; padding:.5rem .75rem; background: var(--card2); border:1px solid var(--line); border-radius:.75rem; font-size:16px; color: var(--ink); outline:none; transition: border .15s; font-family:inherit; }
+    .input:focus { border-color: var(--sage); }
+    textarea.input { resize:none; line-height:1.6; }
+
+    .chk { width:1.5rem; height:1.5rem; border-radius:50%; border:2px solid var(--mist); display:flex; align-items:center; justify-content:center; flex-shrink:0; cursor:pointer; transition: all .15s; }
+    .chk.on { background: var(--sage); border-color: var(--sage); }
+    .chk.on svg { width:12px; height:12px; }
+
+    .tag { display:inline-flex; align-items:center; padding:.1rem .45rem; border-radius:.4rem; font-size:.68rem; font-weight:700; }
+    .tag-投递 { background: var(--blue-p); color: var(--blue); }
+    .tag-学习 { background: var(--green-p); color: var(--green); }
+    .tag-生活 { background: var(--orange-p); color: var(--orange); }
+
+    .bar { height:.45rem; background: var(--line); border-radius:999px; overflow:hidden; }
+    .bar > i { display:block; height:100%; border-radius:999px; transition: width .3s ease, background .3s; }
+
+    .row { display:flex; align-items:center; justify-content:space-between; }
+    .between { display:flex; align-items:center; justify-content:space-between; gap:.75rem; }
+    .muted { color: var(--mist); }
+    .small { font-size:.8rem; }
+    .xs { font-size:.72rem; }
+
+    .dim-run { transition: opacity .4s ease; }
+    body.timer-on .dim-run { opacity:.4; }
+
+    #toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(20px); background: var(--ink); color:#fff; padding:.75rem 1.2rem; border-radius:.75rem; font-size:.85rem; font-weight:500; box-shadow:0 4px 16px rgba(0,0,0,.2); z-index:50; opacity:0; pointer-events:none; transition:opacity .3s, transform .3s; max-width:90%; text-align:center; }
+    #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    select.input { -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' stroke='%238a8a8a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 10px center; padding-right:28px; }
+
+    #progressRing { transition:none; }
+    #progressRing.smooth { transition: stroke-dashoffset .35s ease, stroke .35s ease; }
+    .ring-focus { stroke: var(--sage); }
+    .ring-break { stroke: var(--amber); }
+
+    @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1)} }
+    .pop { animation: pop .3s ease; }
+
+    .dot { width:.7rem; height:.7rem; border-radius:50%; background: var(--line); }
+    .dot.on { background: var(--sage); }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <!-- Header -->
+    <header style="text-align:center; margin-bottom:1.75rem;">
+      <h1 style="font-size:1.5rem; font-weight:800; margin:0; letter-spacing:-.02em;">专注工作台</h1>
+      <p id="dateDisplay" class="muted small" style="margin:.3rem 0 0;"></p>
+    </header>
+
+    <!-- 今日3件事 -->
+    <section class="card">
+      <div class="between" style="margin-bottom:1rem;">
+        <h2 class="sec-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--sage)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          今日3件事
+        </h2>
+        <span id="taskProgress" class="pill pill-sage">0/3 完成</span>
+      </div>
+      <div id="taskList" style="display:flex; flex-direction:column; gap:.75rem;"></div>
+      <button id="addTaskBtn" class="btn btn-ghost btn-sm" style="width:100%; margin-top:1rem;">+ 添加任务</button>
+    </section>
+
+    <!-- 番茄钟 -->
+    <section class="card">
+      <div class="between" style="margin-bottom:.5rem;">
+        <h2 class="sec-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--terra)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 13V9"/><path d="M9 2h6"/><path d="M18 6l1.5-1.5"/></svg>
+          番茄钟
+        </h2>
+        <span id="pomodoroCount" class="pill pill-sage">今日 0 个</span>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; margin:1.25rem 0;">
+        <div style="position:relative; width:200px; height:200px;">
+          <svg width="200" height="200" viewBox="0 0 200 200" style="transform:rotate(-90deg);">
+            <circle cx="100" cy="100" r="90" fill="none" stroke="var(--line)" stroke-width="6"/>
+            <circle id="progressRing" class="ring-focus" cx="100" cy="100" r="90" fill="none" stroke-width="6" stroke-linecap="round" stroke-dasharray="565.49" stroke-dashoffset="0"/>
+          </svg>
+          <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <span id="timerDisplay" style="font-size:2.6rem; font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-.02em;">25:00</span>
+            <span id="timerMode" class="muted xs" style="margin-top:.1rem;">专注模式</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; gap:.75rem; justify-content:center;">
+        <button id="startBtn" class="btn btn-sage" style="flex:1;">开始</button>
+        <button id="resetBtn" class="btn btn-ghost" style="flex:1;">重置</button>
+      </div>
+      <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--line);">
+        <div class="xs muted" style="margin-bottom:.5rem;">本周番茄</div>
+        <div id="weekChart" style="display:flex; align-items:flex-end; gap:.4rem; height:4rem;"></div>
+      </div>
+    </section>
+
+    <!-- 娱乐预算 -->
+    <section class="card dim-run">
+      <div class="between" style="margin-bottom:1rem;">
+        <h2 class="sec-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M7 12h.01M11 12h.01M15 12h.01"/></svg>
+          娱乐预算
+        </h2>
+        <span id="weekBudget" class="xs muted">本周 0 分钟</span>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <div class="between" style="margin-bottom:.5rem;">
+          <span class="small muted">今日剩余</span>
+          <span id="remainingTime" style="font-size:1.5rem; font-weight:800; color:var(--sage);">60 分钟</span>
+        </div>
+        <div class="bar"><i id="budgetBar" style="width:0%; background:var(--sage);"></i></div>
+      </div>
+      <div style="display:flex; gap:.5rem; flex-wrap:wrap; align-items:center;">
+        <button data-deduct="15" class="btn btn-sm" style="background:var(--terra-p); color:var(--terra);">-15分钟</button>
+        <button data-deduct="30" class="btn btn-sm" style="background:var(--terra-p); color:var(--terra);">-30分钟</button>
+        <button data-deduct="-15" class="btn btn-sm" style="background:var(--sage-p); color:var(--sage-d);">+15分钟</button>
+        <div style="display:flex; gap:.4rem; align-items:center;">
+          <input id="customDeduct" type="number" inputmode="numeric" min="1" max="999" placeholder="自定义" class="input" style="width:5rem; min-height:38px; font-size:.85rem; flex-shrink:0;">
+          <button id="customDeductBtn" class="btn btn-ghost btn-sm">扣</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 打卡记录 -->
+    <section class="card">
+      <div class="between" style="margin-bottom:1rem;">
+        <h2 class="sec-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          打卡记录
+        </h2>
+        <button id="addCheckinBtn" class="xs" style="color:var(--blue); background:none; border:none; font-weight:700; cursor:pointer;">+ 新建</button>
+      </div>
+      <div id="checkinList" style="display:flex; flex-direction:column; gap:.75rem;"></div>
+    </section>
+
+    <!-- 电子宠物猫 -->
+    <section class="card">
+      <div class="between" style="margin-bottom:1rem;">
+        <h2 class="sec-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--sage)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8c-3 0-5 2-5 5 0 3 2 5 5 5s5-2 5-5c0-3-2-5-5-5z"/><circle cx="10" cy="12" r=".6" fill="var(--sage)"/><circle cx="14" cy="12" r=".6" fill="var(--sage)"/></svg>
+          电子宠物猫
+        </h2>
+        <span id="catFood" class="pill pill-sage">🐾 0</span>
+      </div>
+      <div style="display:flex; gap:1rem; align-items:center;">
+        <div id="catFace" style="flex-shrink:0; width:96px; height:96px;"></div>
+        <div style="flex:1; min-width:0;">
+          <div class="row" style="margin-bottom:.4rem;">
+            <span class="xs muted">饥饿</span>
+            <span id="catHungerTxt" class="xs" style="font-weight:700;"></span>
+          </div>
+          <div class="bar" style="margin-bottom:.6rem;"><i id="catHungerBar" style="width:80%; background:var(--sage);"></i></div>
+          <div class="row" style="margin-bottom:.4rem;">
+            <span class="xs muted">心情</span>
+            <span id="catMoodTxt" class="xs" style="font-weight:700;"></span>
+          </div>
+          <div class="bar" style="margin-bottom:.6rem;"><i id="catMoodBar" style="width:80%; background:var(--amber);"></i></div>
+          <div class="row">
+            <span class="xs muted">亲密度 Lv.<span id="catLevel">1</span></span>
+            <span id="catStatus" class="xs" style="font-weight:700; color:var(--sage-d);"></span>
+          </div>
+          <div class="bar"><i id="catIntiBar" style="width:0%; background:var(--terra);"></i></div>
+        </div>
+      </div>
+      <button id="feedBtn" class="btn btn-sage" style="width:100%; margin-top:1rem;">喂食（消耗 5 🐾）</button>
+      <p id="catHint" class="xs muted" style="margin:.6rem 0 0; text-align:center;">完成任务可获得猫粮 🐾</p>
+    </section>
+
+    <!-- 每日复盘 -->
+    <section class="card dim-run">
+      <h2 class="sec-title" style="margin-bottom:1rem;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+        每日复盘
+      </h2>
+      <textarea id="reviewInput" rows="3" placeholder="今天最卡住的是什么？写一句就好。" class="input"></textarea>
+      <div style="margin-top:.75rem; padding:.75rem; background:var(--card2); border-radius:.75rem; border:1px solid var(--line);">
+        <div class="xs muted" style="margin-bottom:.3rem;">昨日复盘</div>
+        <p id="yesterdayText" class="small" style="margin:0; font-style:italic; color:var(--mist);"></p>
+      </div>
+    </section>
+
+    <!-- 设置 -->
+    <section class="card dim-run">
+      <h2 class="sec-title" style="margin-bottom:1rem;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--sage)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        设置
+      </h2>
+      <div style="display:flex; flex-direction:column; gap:.75rem;">
+        <div class="between">
+          <span class="small">专注时长</span>
+          <select id="focusDuration" class="input" style="width:auto; min-height:auto; padding:.4rem 1.8rem .4rem .7rem; font-size:.85rem;">
+            <option value="15">15 分钟</option><option value="25" selected>25 分钟</option>
+            <option value="30">30 分钟</option><option value="45">45 分钟</option>
+          </select>
+        </div>
+        <div class="between">
+          <span class="small">休息时长</span>
+          <select id="breakDuration" class="input" style="width:auto; min-height:auto; padding:.4rem 1.8rem .4rem .7rem; font-size:.85rem;">
+            <option value="5" selected>5 分钟</option><option value="10">10 分钟</option><option value="15">15 分钟</option>
+          </select>
+        </div>
+        <div class="between">
+          <span class="small">每日娱乐预算</span>
+          <select id="budgetSelect" class="input" style="width:auto; min-height:auto; padding:.4rem 1.8rem .4rem .7rem; font-size:.85rem;">
+            <option value="30">30 分钟</option><option value="60" selected>60 分钟</option>
+            <option value="90">90 分钟</option><option value="120">120 分钟</option>
+          </select>
+        </div>
+        <div class="between">
+          <span class="small">深色模式</span>
+          <button id="themeToggle" class="btn btn-ghost btn-sm">切换</button>
+        </div>
+      </div>
+      <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--line); display:flex; gap:.75rem;">
+        <button id="exportReportBtn" class="btn btn-sage btn-sm" style="flex:1;">导出周报</button>
+        <button id="resetDataBtn" class="xs" style="background:none; border:none; color:var(--mist); cursor:pointer; align-self:center;">重置数据</button>
+      </div>
+    </section>
+
+    <div style="text-align:center; padding:0 1rem; margin-bottom:1rem;">
+      <p id="quote" class="xs muted" style="font-style:italic; line-height:1.6; margin:0;"></p>
+    </div>
+    <footer style="text-align:center;">
+      <p class="xs" style="color:var(--mist); opacity:.6; margin:0;">专注工作台 v2 · 数据本地存储 · 可离线使用</p>
+    </footer>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    // ===== Constants =====
+    const STORAGE_KEY = 'focus-workspace-v2';
+    const QUOTES = [
+      '新的一周，把任务拆到"现在就能开始"的大小',
+      '你缺的不是能力，是把能力讲清楚的方法',
+      '按下开始那一下，就断了刷手机的惯性',
+      '面试官最想看的是你做过什么、有没有人真在用',
+      '看见自己花了多少时间在娱乐上，就是改变的第一步',
+      '工具是脚手架，不是引擎。真正让你动起来的是行动本身',
+      '今天写一句最卡住的事，明天看一眼，你会发现规律',
+    ];
+    const CATS = ['投递', '学习', '生活'];
+
+    // ===== Date Utils =====
+    function dateStr(d) {
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+    function todayStr() { return dateStr(new Date()); }
+    function getWeekStart(d) {
+      var x = new Date(d);
+      var day = x.getDay();
+      var diff = day === 0 ? 6 : day - 1;
+      x.setDate(x.getDate() - diff);
+      x.setHours(0,0,0,0);
+      return x;
+    }
+    function daysBetween(a, b) {
+      var da = new Date(a + 'T00:00:00');
+      var db = new Date(b + 'T00:00:00');
+      return Math.round((db - da) / 86400000);
+    }
+
+    // ===== State =====
+    let state;
+
+    function defaultState() {
+      const t = todayStr();
+      return {
+        date: t,
+        theme: 'light',
+        tasks: [
+          { text: '投递 3-5 份 AI 应用开发岗位', done: false, category: '投递', repeat: true },
+          { text: '完善作品集与简历', done: false, category: '学习', repeat: true },
+          { text: '学习 AI 应用技能（Prompt / LangChain）', done: false, category: '学习', repeat: true },
+        ],
+        pomodoros: {},
+        completedLog: {},
+        foodLog: {},
+        entertainment: { budget: 60, used: {} },
+        reviews: {},
+        checkins: [
+          { id: 'weibo', name: '微博打卡', icon: '📱', history: {} },
+        ],
+        cat: {
+          food: 0, hunger: 80, mood: 80, intimacy: 0, level: 1,
+          feedCountToday: 0, lastTickDate: t, lastFed: '',
+        },
+        settings: { focusDuration: 25, breakDuration: 5 },
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        let s = raw ? JSON.parse(raw) : null;
+        if (!s) return defaultState();
+        const t = todayStr();
+
+        // 每日重置
+        if (s.date !== t) {
+          var carried = [];
+          (s.tasks || []).forEach(function (task) {
+            if (task.repeat) {
+              carried.push({ text: task.text, done: false, category: task.category || '生活', repeat: true });
+            } else if (!task.done) {
+              carried.push({ text: task.text, done: false, category: task.category || '生活', repeat: false });
+            }
+          });
+          s.tasks = carried;
+          s.date = t;
+        }
+        if (!s.tasks) s.tasks = defaultState().tasks;
+        if (!s.pomodoros) s.pomodoros = {};
+        if (!s.completedLog) s.completedLog = {};
+        if (!s.foodLog) s.foodLog = {};
+        if (!s.entertainment) s.entertainment = { budget: 60, used: {} };
+        if (!s.entertainment.used) s.entertainment.used = {};
+        if (!s.reviews) s.reviews = {};
+        if (!s.checkins) s.checkins = defaultState().checkins;
+        if (!s.cat) s.cat = defaultState().cat;
+        if (!s.settings) s.settings = { focusDuration: 25, breakDuration: 5 };
+        if (!s.theme) s.theme = 'light';
+
+        // 猫饥饿衰减
+        if (s.cat.lastTickDate !== t) {
+          var gap = daysBetween(s.cat.lastTickDate || t, t);
+          if (gap > 0) {
+            s.cat.hunger = Math.max(0, s.cat.hunger - gap * 15);
+            s.cat.mood = Math.max(0, s.cat.mood - gap * 5);
+          }
+          s.cat.feedCountToday = 0;
+          s.cat.lastTickDate = t;
+        }
+
+        // 确保默认打卡在
+        if (s.checkins.length === 0) s.checkins = defaultState().checkins;
+
+        return s;
+      } catch (e) {
+        return defaultState();
+      }
+    }
+
+    function saveState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    // ===== Theme =====
+    function applyTheme(t) {
+      document.documentElement.setAttribute('data-theme', t);
+    }
+
+    // ===== Toast =====
+    let toastTimer;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2500);
+    }
+
+    // ===== Cat SVG =====
+    function catFaceSVG(mood) {
+      const pale = getComputedStyle(document.documentElement).getPropertyValue('--sage-p').trim() || '#e8ede9';
+      const ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#2d2d2d';
+      let eyes, mouth, extra = '';
+      if (mood === 'hungry' || mood === 'sad') {
+        eyes = '<path d="M14 22l5 4M34 22l-5 4" stroke="' + ink + '" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+        mouth = '<path d="M18 34q6 -5 12 0" stroke="' + ink + '" stroke-width="2" fill="none" stroke-linecap="round"/>';
+        if (mood === 'hungry') extra = '<text x="44" y="14" font-size="11" fill="#c4886a">饿~</text>';
+      } else if (mood === 'sleep') {
+        eyes = '<path d="M13 24h8M31 24h8" stroke="' + ink + '" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+        mouth = '<circle cx="24" cy="33" r="1.6" fill="' + ink + '"/>';
+        extra = '<text x="42" y="12" font-size="11" fill="#8a8a8a">z</text>';
+      } else if (mood === 'love') {
+        eyes = '<path d="M14 22c2-3 5-1 4 2-1 2-4 2-4-2zM34 22c2-3 5-1 4 2-1 2-4 2-4-2z" fill="#c4886a"/>';
+        mouth = '<path d="M18 31q6 6 12 0" stroke="' + ink + '" stroke-width="2" fill="none" stroke-linecap="round"/>';
+      } else {
+        eyes = '<path d="M14 22q2.5 -4 5 0M29 22q2.5 -4 5 0" stroke="' + ink + '" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+        mouth = '<path d="M19 31q5 5 10 0" stroke="' + ink + '" stroke-width="2" fill="none" stroke-linecap="round"/>';
+      }
+      return '<svg viewBox="0 0 48 48" width="96" height="96">' +
+        '<path d="M10 18 L7 7 L18 13 Q24 11 30 13 L41 7 L38 18 Q44 26 38 36 Q34 44 24 44 Q14 44 10 36 Q4 26 10 18 Z" fill="' + pale + '" stroke="' + ink + '" stroke-width="1.5"/>' +
+        eyes + mouth + extra +
+        '<path d="M24 27v4M24 31h3" stroke="' + ink + '" stroke-width="1.2" fill="none" stroke-linecap="round"/>' +
+        '<path d="M6 24h7M35 24h7" stroke="' + ink + '" stroke-width="1" stroke-linecap="round" opacity=".5"/>' +
+        '</svg>';
+    }
+
+    function catMood() {
+      const c = state.cat;
+      const h = new Date().getHours();
+      if (c.hunger < 20) return 'hungry';
+      if (c.mood < 30) return 'sad';
+      if (c.intimacy >= 60 && c.mood >= 70) return 'love';
+      if (h >= 22 || h < 7) return 'sleep';
+      return 'happy';
+    }
+
+    function renderCat() {
+      const c = state.cat;
+      document.getElementById('catFood').textContent = '🐾 ' + c.food;
+      document.getElementById('catFace').innerHTML = catFaceSVG(catMood());
+      document.getElementById('catHungerTxt').textContent = c.hunger + '%';
+      document.getElementById('catMoodTxt').textContent = c.mood + '%';
+      document.getElementById('catLevel').textContent = c.level;
+      const moodLabel = { hungry: '肚子饿', sad: '有点丧', sleep: '睡着了', love: '超亲密', happy: '很开心' }[catMood()];
+      document.getElementById('catStatus').textContent = moodLabel;
+
+      const hb = document.getElementById('catHungerBar');
+      hb.style.width = c.hunger + '%';
+      hb.style.background = c.hunger < 20 ? 'var(--terra)' : 'var(--sage)';
+      document.getElementById('catMoodBar').style.width = c.mood + '%';
+      document.getElementById('catIntiBar').style.width = c.intimacy + '%';
+    }
+
+    function earnFood(amount, reason) {
+      state.cat.food += amount;
+      const t = todayStr();
+      state.foodLog[t] = (state.foodLog[t] || 0) + amount;
+      saveState();
+      renderCat();
+      if (reason) showToast(reason);
+    }
+
+    function feedCat() {
+      const c = state.cat;
+      if (c.food < 5) { showToast('猫粮不足，去完成任务赚猫粮吧 🐾'); return; }
+      if (c.feedCountToday >= 6) { showToast('今天喂太多啦，猫猫撑住了 😣'); return; }
+      c.food -= 5;
+      c.hunger = Math.min(100, c.hunger + 20);
+      c.mood = Math.min(100, c.mood + 5);
+      c.intimacy = Math.min(100, c.intimacy + 2);
+      c.feedCountToday += 1;
+      c.lastFed = todayStr();
+      if (c.intimacy >= c.level * 50 && c.level < 10) {
+        c.level += 1;
+        showToast('🎉 猫咪升到 Lv.' + c.level + '！');
+      } else {
+        showToast('猫猫吃得好开心 🐱');
+      }
+      saveState();
+      renderCat();
+    }
+
+    // ===== Tasks =====
+    function renderTasks() {
+      const container = document.getElementById('taskList');
+      container.innerHTML = '';
+      state.tasks.forEach(function (task, i) {
+        const item = document.createElement('div');
+        item.className = 'between';
+        const chkCls = task.done ? 'chk on' : 'chk';
+        const textCls = task.done ? 'muted' : '';
+        const strike = task.done ? 'text-decoration:line-through;' : '';
+        const catTag = '<span class="tag tag-' + (task.category || '生活') + '">' + (task.category || '生活') + '</span>';
+        const repeatTag = task.repeat ? '<span class="xs muted">每日</span>' : '';
+        const safe = (task.text || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        item.innerHTML =
+          '<div style="display:flex; align-items:center; gap:.4rem; flex-shrink:0;">' +
+            '<button class="' + chkCls + '" data-act="toggle" data-i="' + i + '">' + (task.done ? '<svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '') + '</button>' +
+            catTag + repeatTag +
+          '</div>' +
+          '<input type="text" value="' + safe + '" data-i="' + i + '" class="input task-input" style="flex:1; min-height:40px; font-size:15px; ' + strike + ' ' + (task.done ? 'color:var(--mist);' : '') + '" placeholder="输入任务..." autocomplete="off" />' +
+          '<button data-act="del" data-i="' + i + '" style="background:none; border:none; color:var(--mist); cursor:pointer; font-size:1.1rem; flex-shrink:0;">×</button>';
+        container.appendChild(item);
+      });
+
+      const done = state.tasks.filter(function (t) { return t.done; }).length;
+      document.getElementById('taskProgress').textContent = done + '/' + state.tasks.length + ' 完成';
+
+      container.querySelectorAll('[data-act="toggle"]').forEach(function (b) {
+        b.addEventListener('click', function () { toggleTask(parseInt(b.dataset.i)); });
+      });
+      container.querySelectorAll('[data-act="del"]').forEach(function (b) {
+        b.addEventListener('click', function () { deleteTask(parseInt(b.dataset.i)); });
+      });
+      container.querySelectorAll('.task-input').forEach(function (inp) {
+        inp.addEventListener('blur', function () {
+          state.tasks[parseInt(inp.dataset.i)].text = inp.value;
+          saveState();
+        });
+      });
+    }
+
+    function toggleTask(index) {
+      const task = state.tasks[index];
+      task.done = !task.done;
+      saveState();
+      renderTasks();
+      if (task.done) {
+        if (navigator.vibrate) navigator.vibrate(50);
+        const t = todayStr();
+        state.completedLog[t] = (state.completedLog[t] || 0) + 1;
+        earnFood(5, '🐱 +5 猫粮');
+        const allDone = state.tasks.length > 0 && state.tasks.every(function (x) { return x.done; });
+        if (allDone) {
+          setTimeout(function () { earnFood(10, '🎉 全部完成 +10 猫粮'); }, 350);
+          showToast('🎉 今天的任务全部完成！');
+        }
+      }
+    }
+
+    function deleteTask(index) {
+      state.tasks.splice(index, 1);
+      saveState();
+      renderTasks();
+    }
+
+    function addTask() {
+      let cat = '生活';
+      state.tasks.push({ text: '', done: false, category: cat, repeat: false });
+      saveState();
+      renderTasks();
+      const inputs = document.querySelectorAll('.task-input');
+      if (inputs.length) inputs[inputs.length - 1].focus();
+    }
+
+    // ===== Timer =====
+    const timer = { interval: null, endTime: null, remaining: 25*60*1000, isRunning: false, isFocus: true, duration: 25*60*1000 };
+
+    function startTimer() {
+      if (timer.isRunning) { pauseTimer(); return; }
+      if (timer.remaining <= 0) timer.remaining = timer.duration;
+      timer.isRunning = true;
+      timer.endTime = Date.now() + timer.remaining;
+      timer.interval = setInterval(updateTimerDisplay, 250);
+      document.body.classList.add('timer-on');
+      updateStartButton();
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    }
+    function pauseTimer() {
+      timer.isRunning = false;
+      clearInterval(timer.interval);
+      timer.remaining = Math.max(0, timer.endTime - Date.now());
+      document.body.classList.remove('timer-on');
+      updateStartButton(); updateTimerDisplay();
+    }
+    function resetTimer() {
+      pauseTimer();
+      timer.isFocus = true;
+      timer.duration = state.settings.focusDuration * 60 * 1000;
+      timer.remaining = timer.duration;
+      const ring = document.getElementById('progressRing');
+      ring.classList.add('smooth');
+      updateTimerMode(); updateTimerDisplay(); updateStartButton();
+      setTimeout(function () { ring.classList.remove('smooth'); }, 350);
+    }
+    function updateTimerDisplay() {
+      let remaining;
+      if (timer.isRunning) {
+        remaining = timer.endTime - Date.now();
+        if (remaining <= 0) { remaining = 0; onTimerComplete(); return; }
+      } else { remaining = timer.remaining; }
+      const m = Math.floor(remaining / 60000);
+      const s = Math.floor((remaining % 60000) / 1000);
+      document.getElementById('timerDisplay').textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+      const progress = 1 - remaining / timer.duration;
+      const circ = 2 * Math.PI * 90;
+      document.getElementById('progressRing').style.strokeDashoffset = (circ * progress).toFixed(2);
+    }
+    function onTimerComplete() {
+      clearInterval(timer.interval);
+      timer.isRunning = false;
+      document.body.classList.remove('timer-on');
+      playBell();
+      if (navigator.vibrate) navigator.vibrate([200,100,200]);
+      if (timer.isFocus) {
+        const t = todayStr();
+        state.pomodoros[t] = (state.pomodoros[t] || 0) + 1;
+        saveState();
+        earnFood(3, '🍅 +3 猫粮');
+        renderWeekChart();
+        timer.isFocus = false;
+        timer.duration = state.settings.breakDuration * 60 * 1000;
+        timer.remaining = timer.duration;
+        showToast('🍅 专注完成！休息一下');
+      } else {
+        timer.isFocus = true;
+        timer.duration = state.settings.focusDuration * 60 * 1000;
+        timer.remaining = timer.duration;
+        showToast('休息结束，继续专注吧');
+      }
+      const ring = document.getElementById('progressRing');
+      ring.classList.add('smooth');
+      updateTimerMode(); updateTimerDisplay(); updateStartButton();
+      setTimeout(function () { ring.classList.remove('smooth'); }, 350);
+    }
+    function updateTimerMode() {
+      const modeEl = document.getElementById('timerMode');
+      const ringEl = document.getElementById('progressRing');
+      if (timer.isFocus) { modeEl.textContent = '专注模式'; ringEl.setAttribute('class', 'ring-focus'); }
+      else { modeEl.textContent = '休息一下'; ringEl.setAttribute('class', 'ring-break'); }
+    }
+    function updateStartButton() { document.getElementById('startBtn').textContent = timer.isRunning ? '暂停' : '开始'; }
+    function updatePomodoroCount() {
+      document.getElementById('pomodoroCount').textContent = '今日 ' + (state.pomodoros[todayStr()] || 0) + ' 个';
+    }
+
+    // ===== Sound =====
+    let audioCtx;
+    function playBell() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        audioCtx.resume();
+        const now = audioCtx.currentTime;
+        [587.33, 880].forEach(function (f, i) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.frequency.value = f; osc.type = 'sine';
+          const start = now + i * 0.15;
+          gain.gain.setValueAtTime(0, start);
+          gain.gain.linearRampToValueAtTime(i ? 0.15 : 0.25, start + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + 1.5);
+          osc.start(start); osc.stop(start + 1.5);
+        });
+      } catch (e) {}
+    }
+
+    // ===== Entertainment =====
+    function deductEntertainment(min) {
+      const t = todayStr();
+      const cur = state.entertainment.used[t] || 0;
+      state.entertainment.used[t] = Math.max(0, cur + min);
+      saveState(); renderEntertainment();
+    }
+    function renderEntertainment() {
+      const t = todayStr();
+      const used = state.entertainment.used[t] || 0;
+      const budget = state.entertainment.budget;
+      const remaining = budget - used;
+      const pct = Math.min(100, (used / budget) * 100);
+      const el = document.getElementById('remainingTime');
+      if (remaining >= 0) { el.textContent = remaining + ' 分钟'; el.style.color = 'var(--sage)'; }
+      else { el.textContent = '超支 ' + (-remaining) + ' 分钟'; el.style.color = 'var(--terra)'; }
+      const bar = document.getElementById('budgetBar');
+      bar.style.width = pct + '%';
+      bar.style.background = remaining >= 0 ? 'var(--sage)' : 'var(--terra)';
+      let weekTotal = 0;
+      for (let i = 0; i < 7; i++) { const d = new Date(); d.setDate(d.getDate() - i); weekTotal += state.entertainment.used[dateStr(d)] || 0; }
+      document.getElementById('weekBudget').textContent = '本周 ' + weekTotal + ' 分钟';
+    }
+
+    // ===== Review =====
+    function renderReview() {
+      const t = todayStr();
+      const y = new Date(); y.setDate(y.getDate() - 1);
+      document.getElementById('reviewInput').value = state.reviews[t] || '';
+      document.getElementById('yesterdayText').textContent = state.reviews[dateStr(y)] || '（昨天没有记录）';
+    }
+    function saveReview() {
+      const t = todayStr();
+      const val = document.getElementById('reviewInput').value.trim();
+      if (val) {
+        const had = !!state.reviews[t];
+        state.reviews[t] = val;
+        saveState();
+        if (!had) earnFood(2, '📝 +2 猫粮');
+      } else {
+        delete state.reviews[t];
+        saveState();
+      }
+    }
+
+    // ===== Checkins =====
+    function calcStreak(history) {
+      let streak = 0;
+      const d = new Date();
+      for (let i = 0; i < 365; i++) {
+        if (history[dateStr(d)]) { streak++; d.setDate(d.getDate() - 1); }
+        else break;
+      }
+      return streak;
+    }
+    function renderCheckins() {
+      const container = document.getElementById('checkinList');
+      container.innerHTML = '';
+      const today = todayStr();
+      state.checkins.forEach(function (c, idx) {
+        const streak = calcStreak(c.history);
+        let dots = '';
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(); d.setDate(d.getDate() - i);
+          const ds = dateStr(d);
+          const on = !!c.history[ds];
+          const isToday = ds === today;
+          dots += '<div class="dot ' + (on ? 'on' : '') + '" data-ck="' + idx + '" data-day="' + ds + '" style="' + (isToday ? 'outline:2px solid var(--sage); outline-offset:1px;' : '') + '"></div>';
+        }
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex; align-items:center; gap:.75rem; padding:.6rem; background:var(--card2); border-radius:.75rem;';
+        item.innerHTML =
+          '<span style="font-size:1.3rem; flex-shrink:0;">' + (c.icon || '✅') + '</span>' +
+          '<div style="flex:1; min-width:0;">' +
+            '<div class="between"><span class="small" style="font-weight:600;">' + (c.name || '打卡') + '</span>' +
+            '<span class="xs" style="color:var(--blue); font-weight:700;">连续 ' + streak + ' 天</span></div>' +
+            '<div style="display:flex; gap:.3rem; margin-top:.4rem;">' + dots + '</div>' +
+          '</div>' +
+          '<button data-delck="' + idx + '" style="background:none;border:none;color:var(--mist);cursor:pointer;font-size:1.1rem;flex-shrink:0;">×</button>';
+        container.appendChild(item);
+      });
+      container.querySelectorAll('.dot').forEach(function (dot) {
+        dot.addEventListener('click', function () {
+          const ci = parseInt(dot.dataset.ck);
+          const day = dot.dataset.day;
+          const c = state.checkins[ci];
+          if (c.history[day]) delete c.history[day]; else c.history[day] = true;
+          saveState(); renderCheckins();
+          if (c.history[day]) showToast('打卡成功 🎉');
+        });
+      });
+      container.querySelectorAll('[data-delck]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          if (confirm('删除该打卡项？')) { state.checkins.splice(parseInt(b.dataset.delck), 1); saveState(); renderCheckins(); }
+        });
+      });
+    }
+    function addCheckin() {
+      const name = prompt('打卡项名称（如：微博打卡、喝水、运动）：');
+      if (!name) return;
+      const icon = prompt('图标 emoji（可选，如 📱 💧 🏃）：', '✅') || '✅';
+      state.checkins.push({ id: 'c' + Date.now(), name: name, icon: icon, history: {} });
+      saveState(); renderCheckins();
+    }
+
+    // ===== Week Chart =====
+    function renderWeekChart() {
+      const labels = ['日','一','二','三','四','五','六'];
+      const today = todayStr();
+      const data = [], isToday = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        const ds = dateStr(d);
+        data.push(state.pomodoros[ds] || 0);
+        isToday.push(ds === today);
+      }
+      let max = 6;
+      data.forEach(function (v) { if (v > max) max = v; });
+      let html = '';
+      for (let k = 0; k < data.length; k++) {
+        const h = (data[k] / max) * 100;
+        const bg = isToday[k] ? 'var(--sage)' : 'var(--sage-l)';
+        const labCls = isToday[k] ? 'style="color:var(--sage);font-weight:700;"' : 'class="muted"';
+        html += '<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:.25rem;">' +
+          '<span class="xs" style="font-weight:700;color:' + (data[k] ? 'var(--sage)' : 'var(--mist)') + ';">' + (data[k] || '') + '</span>' +
+          '<div style="width:100%; border-radius:4px; height:' + Math.max(4, h) + '%; background:' + bg + '; min-height:4px; transition:height .3s;"></div>' +
+          '<span class="xs" ' + labCls + '>' + labels[new Date(new Date().getTime() - (6-k)*86400000).getDay()] + '</span>' +
+        '</div>';
+      }
+      document.getElementById('weekChart').innerHTML = html;
+      updatePomodoroCount();
+    }
+
+    // ===== Weekly Report =====
+    function exportReport() {
+      const ws = getWeekStart(new Date());
+      const we = new Date(ws); we.setDate(we.getDate() + 6);
+      let focus = 0, completed = 0, food = 0, maxStreak = 0;
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(ws); d.setDate(d.getDate() + i);
+        const ds = dateStr(d);
+        focus += state.pomodoros[ds] || 0;
+        completed += state.completedLog[ds] || 0;
+        food += state.foodLog[ds] || 0;
+      }
+      state.checkins.forEach(function (c) {
+        const s = calcStreak(c.history);
+        if (s > maxStreak) maxStreak = s;
+      });
+      const y = new Date(); y.setDate(y.getDate() - 1);
+      const yReview = state.reviews[dateStr(y)] || '（无）';
+      const total = state.tasks.length || 1;
+      const doneToday = state.tasks.filter(function (t) { return t.done; }).length;
+      const rate = Math.round(doneToday / total * 100);
+
+      const text =
+        '📊 本周专注周报 (' + dateStr(ws) + ' ~ ' + dateStr(we) + ')\n' +
+        '━━━━━━━━━━━━━━━━\n' +
+        '🍅 专注番茄：' + focus + ' 个\n' +
+        '✅ 完成任务：' + completed + ' 项\n' +
+        '📱 打卡最长连续：' + maxStreak + ' 天\n' +
+        '🐱 收获猫粮：' + food + ' 颗\n' +
+        '💪 今日完成率：' + rate + '%\n' +
+        '━━━━━━━━━━━━━━━━\n' +
+        '昨日最卡住：' + yReview + '\n';
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(function () { showToast('周报已复制到剪贴板'); }).catch(function () {});
+      }
+      // 下载
+      try {
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = '周报_' + dateStr(ws) + '.txt';
+        a.click();
+      } catch (e) {}
+    }
+
+    // ===== Init =====
+    function init() {
+      state = loadState();
+      applyTheme(state.theme);
+
+      const d = new Date();
+      const wd = ['日','一','二','三','四','五','六'];
+      document.getElementById('dateDisplay').textContent = (d.getMonth()+1) + '月' + d.getDate() + '日 星期' + wd[d.getDay()];
+      document.getElementById('quote').textContent = QUOTES[d.getDay() === 0 ? 6 : d.getDay() - 1];
+
+      document.getElementById('focusDuration').value = state.settings.focusDuration;
+      document.getElementById('breakDuration').value = state.settings.breakDuration;
+      document.getElementById('budgetSelect').value = state.entertainment.budget;
+
+      timer.duration = state.settings.focusDuration * 60 * 1000;
+      timer.remaining = timer.duration;
+      const ring = document.getElementById('progressRing');
+      ring.style.strokeDasharray = (2 * Math.PI * 90).toFixed(2);
+      ring.style.strokeDashoffset = '0';
+      updateTimerMode(); updateTimerDisplay(); updateStartButton();
+
+      renderTasks(); renderEntertainment(); renderReview(); renderWeekChart(); renderCheckins(); renderCat();
+
+      document.getElementById('startBtn').addEventListener('click', startTimer);
+      document.getElementById('resetBtn').addEventListener('click', resetTimer);
+      document.getElementById('addTaskBtn').addEventListener('click', addTask);
+      document.getElementById('feedBtn').addEventListener('click', feedCat);
+      document.getElementById('addCheckinBtn').addEventListener('click', addCheckin);
+      document.getElementById('exportReportBtn').addEventListener('click', exportReport);
+
+      document.querySelectorAll('[data-deduct]').forEach(function (b) {
+        b.addEventListener('click', function () { deductEntertainment(parseInt(b.dataset.deduct)); });
+      });
+      document.getElementById('customDeductBtn').addEventListener('click', function () {
+        const v = parseInt(document.getElementById('customDeduct').value);
+        if (v > 0) deductEntertainment(v);
+        document.getElementById('customDeduct').value = '';
+      });
+      document.getElementById('customDeduct').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') document.getElementById('customDeductBtn').click();
+      });
+
+      const review = document.getElementById('reviewInput');
+      review.addEventListener('blur', saveReview);
+      review.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { saveReview(); showToast('复盘已保存'); e.target.blur(); }
+      });
+
+      document.getElementById('focusDuration').addEventListener('change', function (e) {
+        state.settings.focusDuration = parseInt(e.target.value); saveState();
+        if (!timer.isRunning && timer.isFocus) { timer.duration = state.settings.focusDuration * 60 * 1000; timer.remaining = timer.duration; updateTimerDisplay(); }
+      });
+      document.getElementById('breakDuration').addEventListener('change', function (e) {
+        state.settings.breakDuration = parseInt(e.target.value); saveState();
+        if (!timer.isRunning && !timer.isFocus) { timer.duration = state.settings.breakDuration * 60 * 1000; timer.remaining = timer.duration; updateTimerDisplay(); }
+      });
+      document.getElementById('budgetSelect').addEventListener('change', function (e) {
+        state.entertainment.budget = parseInt(e.target.value); saveState(); renderEntertainment();
+      });
+      document.getElementById('themeToggle').addEventListener('click', function () {
+        state.theme = state.theme === 'light' ? 'dark' : 'light';
+        applyTheme(state.theme); saveState(); renderCat();
+      });
+
+      document.getElementById('resetDataBtn').addEventListener('click', function () {
+        if (confirm('确定重置全部数据？此操作不可撤销。')) { localStorage.removeItem(STORAGE_KEY); location.reload(); }
+      });
+
+      if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(function () {}); }
+
+      document.addEventListener('visibilitychange', function () {
+        if (!document.hidden && timer.isRunning) updateTimerDisplay();
+      });
+
+      // 跨午夜刷新
+      setInterval(function () {
+        if (state.date !== todayStr()) {
+          state = loadState();
+          renderTasks(); renderEntertainment(); renderReview(); renderWeekChart(); renderCheckins(); renderCat();
+          const d2 = new Date();
+          document.getElementById('dateDisplay').textContent = (d2.getMonth()+1) + '月' + d2.getDate() + '日 星期' + wd[d2.getDay()];
+        }
+      }, 60000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
