@@ -1,8 +1,16 @@
-/* 专注工作台 Service Worker v3
+/* 专注工作台 Service Worker v4
    策略：stale-while-revalidate —— 先用缓存秒开，后台悄悄更新，下次打开就是新版。
    完全离线可用（页面零外部依赖）。 */
-const CACHE = 'focus-workspace-v3';
-const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
+const CACHE = 'focus-workspace-v4';
+const ASSETS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './apple-touch-icon.png',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-512.png'
+];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
